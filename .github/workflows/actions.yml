@@ -19,11 +19,12 @@ jobs:
         run: ./gradlew build
       - name: Setup JFrog artifactory 
         uses: jfrog/setup-jfrog-cli@v3
-        # JFrog platform url (for example: https://acme.jfrog.io) 
-        JF_URL: ${{ secrets.JF_URL }}
+        env:
+          # JFrog platform url (for example: https://acme.jfrog.io) 
+          JF_URL: ${{ secrets.JF_URL }}
     
-        # JFrog Platform access token
-        JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+          # JFrog Platform access token
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
 
 # Execute unit tests
       - name: Unit Test
