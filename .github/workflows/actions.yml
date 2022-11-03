@@ -9,6 +9,7 @@ on:
       - main
 
 jobs:
+  # Building the sourcecode by checking it out firstly and then building it with Gradle
   build:
     runs-on: ubuntu-latest
     steps:
@@ -16,11 +17,18 @@ jobs:
         uses: actions/checkout@v2
       - name: Build the app
         run: ./gradlew build
+      - name: Upload artifactory 
+        uses: jfrog/setup-jfrog-cli@v3
 
 # Execute unit tests
       - name: Unit Test
         run: ./gradlew testDebugUnitTest
+        
+# Deploy the artifact (APK) to JFrog artifactory
+      - name: Getting JFrog version printed out
+        run: jf --version
 
+# Show Android Test Report 
       - name: Android Test Report
         uses: asadmansr/android-test-report-action@v1.2.0
         if: ${{ always() }} # IMPORTANT: run Android Test Report 
