@@ -48,7 +48,7 @@ jobs:
 # Upload artifacts finally
       - name: Upload APK to Jfrog
         run: |
-         jf rt u "app/build/outputs/apk/debug/(*).apk" androidapptest-generic-local/debug-releases/{1} --recursive=false
+         jf rt u "app/build/outputs/apk/debug/(*).apk" androidapptest-generic-local/debug-releases/{1}.apk --recursive=false
          jf rt bp
 
 # Show Android Test Report 
