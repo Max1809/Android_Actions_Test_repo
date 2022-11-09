@@ -24,7 +24,7 @@ jobs:
         run: ./gradlew build
 
   test:
-    runs-on: ubunto-latest
+    runs-on: ubuntu-latest
     needs: build # runs only if build was successful
     steps:
       # Execute unit tests
