@@ -1,4 +1,5 @@
-name: Building the APK as sample 
+# actions.yml that describes how to build & test & deploy a debug artifact of our app
+name: Buildinging APK (debug)
 
 on:
   # Trigger on every pull request and on push
@@ -11,56 +12,63 @@ on:
 jobs:
   # Building the sourcecode by checking it out firstly and then building it with Gradle
   build:
+    # just use a ubuntu VM
     runs-on: ubuntu-latest
     steps:
+      # Checkout / Pull the source code into the VM
       - name: Checkout the code
         uses: actions/checkout@v2
+
+      # Build it now based on the provided gradle file with Gradle
       - name: Build the app
         run: ./gradlew build
-        
+
+      # Execute unit tests
+      - name: Unit Test
+        run: ./gradlew testDebug
+
+      # Setting up some basics to be able to push the artifact to JFrog
       - name: Setup JFrog artifactory 
         uses: jfrog/setup-jfrog-cli@v3
         env:
-          # JFrog platform url (for example: https://acme.jfrog.io) 
+          # JFrog platform url - getting the URL from GitHub actions environment variables
           JF_URL: ${{ secrets.JF_URL }}
     
           # JFrog Platform access token
           JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
 
-      - name: Save name of our Artifact
+      # Some tricky part where we get the name of the build APK so we can use the same when pushing it to artifactory
+      - name: Get the name of the artifact and save it
         id: set-result-artifact
         run: |
           ARTIFACT_PATHNAME_APK=$(ls app/build/outputs/apk/debug/*.apk | head -n 1)
           ARTIFACT_NAME_APK=$(basename $ARTIFACT_PATHNAME_APK)
           echo "ARTIFACT_NAME_APK is " ${ARTIFACT_NAME_APK}
           echo "ARTIFACT_PATHNAME_APK=${ARTIFACT_PATHNAME_APK}" >> $GITHUB_ENV
-          echo "ARTIFACT_NAME_APK=${ARTIFACT_NAME_APK}" >> $GITHUB_ENV    
+          echo "ARTIFACT_NAME_APK=${ARTIFACT_NAME_APK}" >> $GITHUB_ENV  
 
+      # Finally after the build was done and we determined the correct name for the artifact its time to upload the APK
       - name: Upload APK
         uses: actions/upload-artifact@v1
         with:
           name: apk
           path: ${{ env.ARTIFACT_PATHNAME_APK }}
-
-# Execute unit tests
-      - name: Unit Test
-        run: ./gradlew testDebugUnitTest
         
-# Deploy the artifact (APK) to JFrog artifactory
+      # Deploy the artifact (APK) to JFrog artifactory
       - name: Getting JFrog version printed out
         run: jf --version
         
-# Ping JFrog
+      # Ping JFrog - is there a connection?
       - name: Ping Jfrog
         run: jf rt ping
 
-# Upload artifacts finally
+      # Upload artifacts finally
       - name: Upload APK to Jfrog
         run: |
          jf rt u "app/build/outputs/apk/debug/(*).apk" androidapptest-generic-local/debug-releases/{1}.apk --recursive=false
          jf rt bp
 
-# Show Android Test Report 
+      # Show Android Test Report (this is based on defined JUnit tests)
       - name: Android Test Report
         uses: asadmansr/android-test-report-action@v1.2.0
         if: ${{ always() }} # IMPORTANT: run Android Test Report 
