@@ -23,11 +23,16 @@ jobs:
       - name: Build the app
         run: ./gradlew build
 
+      - name: Show me the name of the APK
+        run: |
+          ARTIFACT_PATHNAME_APK=$(ls app/build/outputs/apk/debug/*.apk | head -n 1)
+          echo "ARTIFACT_PATHNAME_APK=${ARTIFACT_PATHNAME_APK}"  >> $GITHUB_ENV
+
       - name: Save APK temporary for next job
         uses: actions/upload-artifact@v1
         with:
           name: apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: ${{ env.ARTIFACT_PATHNAME_APK }}
   test:
     runs-on: ubuntu-latest
     needs: build # runs only if build was successful
