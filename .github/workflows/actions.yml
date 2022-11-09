@@ -1,5 +1,5 @@
 # actions.yml that describes how to build & test & deploy a debug artifact of our app
-name: Buildinging APK (debug)
+name: Build the APK (debug), test it and deploy
 
 on:
   # Trigger on every pull request and on push
@@ -23,10 +23,12 @@ jobs:
       - name: Build the app
         run: ./gradlew build
 
+  test:
       # Execute unit tests
       - name: Unit Test
         run: ./gradlew testDebug
 
+  deploy:
       # Setting up some basics to be able to push the artifact to JFrog
       - name: Setup JFrog artifactory 
         uses: jfrog/setup-jfrog-cli@v3
@@ -68,6 +70,7 @@ jobs:
          jf rt u "app/build/outputs/apk/debug/(*).apk" androidapptest-generic-local/debug-releases/{1}.apk --recursive=false
          jf rt bp
 
+  testreport:
       # Show Android Test Report (this is based on defined JUnit tests)
       - name: Android Test Report
         uses: asadmansr/android-test-report-action@v1.2.0
