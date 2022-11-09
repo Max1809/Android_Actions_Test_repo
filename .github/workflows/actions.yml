@@ -24,11 +24,15 @@ jobs:
         run: ./gradlew build
 
   test:
+    runs-on: ubunto-latest
+    steps:
       # Execute unit tests
       - name: Unit Test
         run: ./gradlew testDebug
 
   deploy:
+    runs-on: ubuntu-latest
+    steps:
       # Setting up some basics to be able to push the artifact to JFrog
       - name: Setup JFrog artifactory 
         uses: jfrog/setup-jfrog-cli@v3
@@ -71,7 +75,9 @@ jobs:
          jf rt bp
 
   testreport:
+    runs-on: ubuntu-latest
+    steps:
       # Show Android Test Report (this is based on defined JUnit tests)
       - name: Android Test Report
         uses: asadmansr/android-test-report-action@v1.2.0
-        if: ${{ always() }} # IMPORTANT: run Android Test Report 
+        if: ${{ always() }} # IMPORTANT: run Android Test Report
