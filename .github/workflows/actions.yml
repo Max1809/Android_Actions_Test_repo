@@ -29,10 +29,10 @@ jobs:
         run: ./gradlew build
 
       - name: Save APK temporary for next job
-          uses: actions/upload-artifact@v1
-          with:
-            name: apk
-            path: app/build/outputs/apk/debug/app-debug.apk
+        uses: actions/upload-artifact@v1
+        with:
+          name: apk
+          path: app/build/outputs/apk/debug/app-debug.apk
   test:
     runs-on: ubuntu-latest
     needs: build # runs only if build was successful
