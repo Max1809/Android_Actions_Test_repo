@@ -45,6 +45,14 @@ jobs:
       - name: Unit Test
         run: ./gradlew testDebug
 
+      - name: Upload Test Reports Folder
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }} # IMPORTANT: Upload reports regardless of status
+        with:
+          name: reports
+          path: app/build/test-results # path to where the xml test results are stored
+
+
   deploy:
     runs-on: ubuntu-latest
     needs: test #runs only after test was successful
@@ -99,10 +107,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy #runs only after deploy
     steps:
-      - name: Download APK from build
-        uses: actions/download-artifact@v1
+      - name: Download Test Reports Folder
+        uses: actions/download-artifact@v2
         with:
-          name: apk
+          name: reports
 
       # Show Android Test Report (this is based on defined JUnit tests)
       - name: Android Test Report
