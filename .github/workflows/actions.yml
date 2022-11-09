@@ -25,6 +25,7 @@ jobs:
 
   test:
     runs-on: ubunto-latest
+    needs: build # runs only if build was successful
     steps:
       # Execute unit tests
       - name: Unit Test
@@ -32,6 +33,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    needs: test #runs only after test was successful
     steps:
       # Setting up some basics to be able to push the artifact to JFrog
       - name: Setup JFrog artifactory 
@@ -74,8 +76,9 @@ jobs:
          jf rt u "app/build/outputs/apk/debug/(*).apk" androidapptest-generic-local/debug-releases/{1}.apk --recursive=false
          jf rt bp
 
-  testreport:
+  report:
     runs-on: ubuntu-latest
+    needs: deploy #runs only after deploy
     steps:
       # Show Android Test Report (this is based on defined JUnit tests)
       - name: Android Test Report
